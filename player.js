@@ -158,4 +158,16 @@ function pauseSong() {
     `⏸️ Song paused at ${Math.floor(currentTime)} seconds`
   );
 }
+function resumeSong() {
 
+  if (!isPaused) {
+    console.log("❌ Song is not paused");
+    return;
+  }
+
+  console.log("▶️ Resuming song...");
+
+  isPaused = false;
+
+  playCurrentSong();
+}
