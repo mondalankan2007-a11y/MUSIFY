@@ -135,5 +135,27 @@ function playCurrentSong() {
   });
 }
 
+function pauseSong() {
 
+  if (!childProcess) {
+    console.log("❌ No song is playing");
+    return;
+  }
+
+
+  const elapsedTime = (Date.now() - startTime) / 1000;
+
+  currentTime += elapsedTime;
+
+
+  childProcess.kill();
+
+  childProcess = null;
+
+  isPaused = true;
+
+  console.log(
+    `⏸️ Song paused at ${Math.floor(currentTime)} seconds`
+  );
+}
 
