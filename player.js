@@ -1,37 +1,139 @@
 const { spawn } = require("child_process");
 const fs = require("fs");
 
-// Read all the mp3 files
 const path = "./songs";
-let childProcess = null;
-const songs = fs.readdirSync(path).filter((el) => el.endsWith(".mp3"));
 
-console.log(`🎶 Welcome to the Songs App 🎶\n`);
+const songs = fs
+  .readdirSync(path)
+  .filter((el) => el.endsWith(".mp3"));
+
+let childProcess = null;
+
+let currentSong = 0;
+
+
+let currentTime = 0;
+
+
+let startTime = 0;
+
+
+let isPaused = false;
+
+
+console.log(`🎶 Welcome to MUSIFY 🎶\n`);
 
 for (let i = 0; i < songs.length; i++) {
   console.log(`${i + 1}: ${songs[i].split(".")[0]}`);
 }
 
-console.log(`\n🎵 Select a number to play the song`);
+console.log(`
+--------------------------------
+1, 2, 3... → Play song
+p           → Pause
+r           → Resume
+s           → Skip +10 seconds
+n           → Next song
+b           → Previous song
+q           → Quit
+--------------------------------
+`);
+
+
 
 process.stdin.setEncoding("utf-8");
 
 process.stdin.on("data", (input) => {
-  // console.log(+input.toString());
-  const userInput = +input.toString();
-  player(userInput);
+
+  const command = input.toString().trim();
+
+  if (!isNaN(command) && command !== "") {
+    player(Number(command));
+  }
+  else if (command === "p") {
+    pauseSong();
+  }
+  else if (command === "r") {
+    resumeSong();
+  }
+  else if (command === "s") {
+    skipSong();
+  }
+  else if (command === "n") {
+    nextSong();
+  }
+  else if (command === "b") {
+    previousSong();
+  }
+  else if (command === "q") {
+    quitPlayer();
+  }
+  else {
+    console.log("❌ Invalid command");
+  }
+
 });
 
 function player(userInput) {
-  console.log(`Selected Song: ${songs[userInput - 1]}`);
+
+
+  if (userInput < 1 || userInput > songs.length) {
+    console.log("❌ Invalid song number");
+    return;
+  }
+  currentSong = userInput - 1;
+
+  currentTime = 0;
+
+  isPaused = false;
+
+  playCurrentSong();
+}
+
+
+
+
+function playCurrentSong() {
 
   if (childProcess) {
     childProcess.kill();
+    childProcess = null;
   }
 
-  childProcess = spawn("afplay", [`./songs/${songs[userInput - 1]}`]);
+  console.log(
+    `🎵 Playing: ${songs[currentSong]}`
+  );
+
+  console.log(
+    `⏱️ Starting from: ${Math.floor(currentTime)} seconds`
+  );
+
+  childProcess = spawn("ffplay", [
+    "-nodisp",
+    "-autoexit",
+    "-loglevel",
+    "quiet",
+    "-ss",
+    String(currentTime),
+    `./songs/${songs[currentSong]}`
+  ]);
+
+  startTime = Date.now();
+
   childProcess.on("close", () => {
-    console.log("Song finished...");
-    process.exit(0);
+
+
+    if (childProcess === null) {
+      return;
+    }
+
+    childProcess = null;
+
+    console.log("🎵 Song finished...");
+
+    currentTime = 0;
   });
 }
+
+
+
