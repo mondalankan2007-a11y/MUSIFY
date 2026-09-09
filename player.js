@@ -171,3 +171,40 @@ function resumeSong() {
 
   playCurrentSong();
 }
+function skipSong() {
+
+  if (!childProcess && !isPaused) {
+    console.log("❌ No song is playing");
+    return;
+  }
+
+  if (childProcess) {
+
+    const elapsedTime = (Date.now() - startTime) / 1000;
+
+    currentTime += elapsedTime;
+
+  }
+
+
+  currentTime += 10;
+
+
+  if (childProcess) {
+    childProcess.kill();
+    childProcess = null;
+  }
+
+  console.log(
+    `⏭️ Skipped to ${Math.floor(currentTime)} seconds`
+  );
+
+
+  if (isPaused) {
+    console.log("⏸️ Song remains paused");
+    return;
+  }
+
+
+  playCurrentSong();
+}
