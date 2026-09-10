@@ -225,3 +225,19 @@ function nextSong() {
 
   playCurrentSong();
 }
+function previousSong() {
+
+  
+  currentSong--;
+
+
+  if (currentSong < 0) {
+    currentSong = songs.length - 1;
+  }
+
+  currentTime = 0;
+
+  isPaused = false;
+
+  playCurrentSong();
+}
