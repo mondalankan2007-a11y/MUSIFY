@@ -241,3 +241,14 @@ function previousSong() {
 
   playCurrentSong();
 }
+function quitPlayer() {
+
+  if (childProcess) {
+    childProcess.kill();
+    childProcess = null;
+  }
+
+  console.log("👋 Exiting Musify...");
+
+  process.exit(0);
+}
