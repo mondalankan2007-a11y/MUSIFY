@@ -208,3 +208,20 @@ function skipSong() {
 
   playCurrentSong();
 }
+
+function nextSong() {
+
+
+  currentSong++;
+
+
+  if (currentSong >= songs.length) {
+    currentSong = 0;
+  }
+
+  currentTime = 0;
+
+  isPaused = false;
+
+  playCurrentSong();
+}
