@@ -1,13 +1,17 @@
 const { spawn } = require("child_process");
 const fs = require("fs");
 
+
+
 const path = "./songs";
 
 const songs = fs
   .readdirSync(path)
   .filter((el) => el.endsWith(".mp3"));
 
+
 let childProcess = null;
+
 
 let currentSong = 0;
 
@@ -21,7 +25,8 @@ let startTime = 0;
 let isPaused = false;
 
 
-console.log(`🎶 Welcome to MUSIFY 🎶\n`);
+
+console.log(`🎶 Welcome to the Songs App 🎶\n`);
 
 for (let i = 0; i < songs.length; i++) {
   console.log(`${i + 1}: ${songs[i].split(".")[0]}`);
@@ -41,38 +46,56 @@ q           → Quit
 
 
 
+
 process.stdin.setEncoding("utf-8");
 
 process.stdin.on("data", (input) => {
 
   const command = input.toString().trim();
 
+
   if (!isNaN(command) && command !== "") {
     player(Number(command));
   }
+
+
   else if (command === "p") {
     pauseSong();
   }
+
+
   else if (command === "r") {
     resumeSong();
   }
+
+
   else if (command === "s") {
     skipSong();
   }
+
+
   else if (command === "n") {
     nextSong();
   }
+
+
   else if (command === "b") {
     previousSong();
   }
+
+
   else if (command === "q") {
     quitPlayer();
   }
+
+
   else {
     console.log("❌ Invalid command");
   }
 
 });
+
+
 
 function player(userInput) {
 
@@ -81,9 +104,13 @@ function player(userInput) {
     console.log("❌ Invalid song number");
     return;
   }
+
+
   currentSong = userInput - 1;
 
+
   currentTime = 0;
+
 
   isPaused = false;
 
@@ -108,7 +135,9 @@ function playCurrentSong() {
     `⏱️ Starting from: ${Math.floor(currentTime)} seconds`
   );
 
-  childProcess = spawn("ffplay", [
+
+
+  const newProcess = spawn("ffplay", [
     "-nodisp",
     "-autoexit",
     "-loglevel",
@@ -118,12 +147,18 @@ function playCurrentSong() {
     `./songs/${songs[currentSong]}`
   ]);
 
+
+
+  childProcess = newProcess;
+
+
   startTime = Date.now();
 
-  childProcess.on("close", () => {
 
 
-    if (childProcess === null) {
+  newProcess.on("close", () => {
+
+    if (childProcess !== newProcess) {
       return;
     }
 
@@ -135,6 +170,8 @@ function playCurrentSong() {
   });
 }
 
+
+
 function pauseSong() {
 
   if (!childProcess) {
@@ -143,14 +180,16 @@ function pauseSong() {
   }
 
 
-  const elapsedTime = (Date.now() - startTime) / 1000;
+  const elapsedTime =
+    (Date.now() - startTime) / 1000;
+
 
   currentTime += elapsedTime;
-
 
   childProcess.kill();
 
   childProcess = null;
+
 
   isPaused = true;
 
@@ -158,6 +197,10 @@ function pauseSong() {
     `⏸️ Song paused at ${Math.floor(currentTime)} seconds`
   );
 }
+
+
+
+
 function resumeSong() {
 
   if (!isPaused) {
@@ -169,31 +212,39 @@ function resumeSong() {
 
   isPaused = false;
 
+
   playCurrentSong();
 }
+
+
+
 function skipSong() {
+
 
   if (!childProcess && !isPaused) {
     console.log("❌ No song is playing");
     return;
   }
 
+
+
   if (childProcess) {
 
-    const elapsedTime = (Date.now() - startTime) / 1000;
+    const elapsedTime =
+      (Date.now() - startTime) / 1000;
 
     currentTime += elapsedTime;
-
   }
 
-
   currentTime += 10;
+
 
 
   if (childProcess) {
     childProcess.kill();
     childProcess = null;
   }
+
 
   console.log(
     `⏭️ Skipped to ${Math.floor(currentTime)} seconds`
@@ -206,8 +257,12 @@ function skipSong() {
   }
 
 
+
   playCurrentSong();
 }
+
+
+
 
 function nextSong() {
 
@@ -219,29 +274,42 @@ function nextSong() {
     currentSong = 0;
   }
 
+
+
   currentTime = 0;
 
   isPaused = false;
 
   playCurrentSong();
 }
+
+
+
 function previousSong() {
 
-  
+
   currentSong--;
+
 
 
   if (currentSong < 0) {
     currentSong = songs.length - 1;
   }
 
+
+
   currentTime = 0;
 
   isPaused = false;
 
   playCurrentSong();
 }
+
+
+
+
 function quitPlayer() {
+
 
   if (childProcess) {
     childProcess.kill();
